@@ -115,6 +115,31 @@ Agent Studio            Cosmos / Prism           Sentinel
                                                Circuit Breaker, Alerts, Dashboard
 ```
 
+### Use Case Diagram
+
+```mermaid
+flowchart LR
+    actor ProdAgent[Production AI Agent]
+    actor ML[ML Engineer]
+    actor Risk[Risk Auditor]
+
+    subgraph Sentinel Governance Engine
+        Ingest[Ingest Live Predictions]
+        Evaluate[Run Mathematical Checks]
+        TripCB[Trip Circuit Breaker]
+        Dashboard[View Health Dashboard]
+        Judge[Trigger LLM-as-Judge]
+    end
+
+    ProdAgent -->|Submits Output| Ingest
+    Ingest --> Evaluate
+    Evaluate --> TripCB
+    
+    ML -->|Investigates Drift| Dashboard
+    ML -->|Resolves Flags| Judge
+    Risk -->|Reviews Compliance| Dashboard
+```
+
 The three systems are **complementary, not competing**. Sentinel attaches at the output layer and operates independently of which model was used or what permissions the agent had.
 
 ---
@@ -316,6 +341,41 @@ Also, `phase_seed = seed if day < 5 else seed + 1000` shifts the entire random s
 
 ## 9. Evaluation Dataset Design
 
+### Entity-Relationship (ER) Diagram
+
+```mermaid
+erDiagram
+    Agent {
+        string agent_id PK
+        string persona
+        string status "ACTIVE | PAUSED"
+    }
+    EvalCase {
+        string case_id PK
+        string agent_id FK
+        string input_payload
+        string ground_truth
+        string duplicate_of FK "Self-referencing"
+    }
+    AgentOutput {
+        string claim
+        float confidence
+        string[] evidence_cited
+        float cost_usd
+        float latency_ms
+    }
+    Incident {
+        string flag_type "ungrounded | inconsistent | drift_detected"
+        string case_id FK
+        string detail
+        datetime timestamp
+    }
+
+    Agent ||--o{ EvalCase : "evaluates on"
+    EvalCase ||--|| AgentOutput : "generates"
+    AgentOutput ||--o| Incident : "may trigger"
+```
+
 ### Dataset Structure Principles
 
 Each of the 8 JSON evaluation datasets (`eval_sets/*.json`) was designed with these requirements:
@@ -396,6 +456,40 @@ cost = (usage.input_tokens * 0.25 + usage.output_tokens * 1.25) / 1_000_000
 ---
 
 ## 11. End-to-End Data Flow
+
+### Evaluation Activity Diagram
+
+```mermaid
+stateDiagram-v2
+    [*] --> IngestAgentOutput
+    IngestAgentOutput --> CalculateScores
+    
+    state CalculateScores {
+        [*] --> GroundednessCheck
+        [*] --> ConsistencyCheck
+        [*] --> CalibrationCheck
+        GroundednessCheck --> CompositeScore
+        ConsistencyCheck --> CompositeScore
+        CalibrationCheck --> CompositeScore
+    }
+    
+    CalculateScores --> CUSUMUpdate
+    
+    state CUSUMUpdate {
+        UpdateBaseline --> CheckThreshold
+    }
+    
+    CUSUMUpdate --> CircuitBreakerEvaluation
+    
+    state CircuitBreakerEvaluation {
+        state if_state <<choice>>
+        if_state --> AutoPause: Score < 0.4 OR Drift
+        if_state --> Nominal: Score >= 0.4 AND No Drift
+    }
+    
+    CircuitBreakerEvaluation --> DispatchAlerts
+    DispatchAlerts --> [*]
+```
 
 ### Path 1: Batch Fleet Evaluation (GET /api/fleet)
 

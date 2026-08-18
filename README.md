@@ -64,29 +64,26 @@ That gap is Sentinel.
 
 Every AI agent in the fleet — regardless of LLM vendor or framework — submits output through one shared contract (`AgentOutput`). Sentinel then runs **four independent mathematical checks** on that output:
 
-```
-Agent Output (claim + evidence + confidence)
-           │
-           ▼
-  ┌─────────────────────────────────────────────────┐
-  │           SENTINEL EVALUATION CORE              │
-  │                                                 │
-  │  Check 01: Groundedness  ──► TF-IDF cosine      │
-  │  Check 02: Consistency   ──► paraphrase pairs   │
-  │  Check 03: Calibration   ──► Brier + ECE        │
-  │  Check 04: Drift         ──► CUSUM control      │
-  │                                                 │
-  │  Composite = 0.45·G + 0.35·C − 0.20·Brier      │
-  │              ─────────────────────────          │
-  │                     0.80                        │
-  └──────────────────────┬──────────────────────────┘
-                         │
-          ┌──────────────┼──────────────┐
-          ▼              ▼              ▼
-    Circuit Breaker   Incident     Webhook
-    (auto-pause)      Feed UI      Dispatch
-    composite < 0.4   Dashboard    ALERT_WEBHOOK_URL
-    OR drift=True
+```mermaid
+flowchart TD
+    Output[Agent Output Claim + Evidence] --> Core[Sentinel Evaluation Core]
+    
+    subgraph Core[Sentinel Evaluation Core]
+        Check1[Check 01: Groundedness<br/>TF-IDF cosine]
+        Check2[Check 02: Consistency<br/>paraphrase pairs]
+        Check3[Check 03: Calibration<br/>Brier + ECE]
+        Check4[Check 04: Drift<br/>CUSUM control]
+    end
+    
+    Core --> Comp[Composite Score = 0.45·G + 0.35·C - 0.20·Brier]
+    
+    Comp --> CheckCB{Circuit Breaker Check}
+    CheckCB -->|Composite < 0.40 OR Drift| Trip[Circuit Breaker Trips]
+    CheckCB -->|Nominal| Safe[Agent Active]
+    
+    Trip --> Action1[Auto-Pause Agent]
+    Trip --> Action2[Dashboard Alert]
+    Trip --> Action3[Webhook Dispatch]
 ```
 
 In addition to the automated checks, any flagged case can be escalated to the **LLM-as-Judge** engine (`POST /api/agents/{id}/judge`), which calls a real Claude or Gemini API — or falls back to the TF-IDF heuristic — to produce a human-readable YES/NO verdict with a one-sentence rationale.
@@ -94,6 +91,48 @@ In addition to the automated checks, any flagged case can be escalated to the **
 ---
 
 ## 🏛 Architecture Overview
+
+```mermaid
+graph TB
+    subgraph Client Layer
+        LiveTraffic[Live Production Agents]
+        User[Human Evaluator]
+    end
+
+    subgraph Sentinel Control Tower
+        Router[FastAPI Gateway]
+        Tower[Evaluation Orchestrator]
+        
+        subgraph Mathematical Checks
+            Groundedness[Check 01: Groundedness]
+            Consistency[Check 02: Consistency]
+            Calibration[Check 03: Calibration]
+            Drift[Check 04: CUSUM Drift]
+        end
+        
+        Breaker[Automated Circuit Breaker]
+        Judge[LLM-as-Judge Engine]
+    end
+
+    subgraph Storage & Dashboard
+        History[(history.json)]
+        Dashboard[React UI]
+    end
+
+    LiveTraffic -->|POST /api/ingest| Router
+    User -->|Views| Dashboard
+    Dashboard <-->|REST API| Router
+    
+    Router --> Tower
+    Tower --> MathematicalChecks
+    Drift -->|Threshold crossed| Breaker
+    Breaker -->|Auto-Pause| History
+    
+    Tower --> Judge
+    Tower --> History
+```
+
+### Directory Structure
 
 ```
 sentinel/
