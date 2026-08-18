@@ -1,0 +1,120 @@
+[
+  {
+    "case_id": "rr-001",
+    "agent_id": "risk_review",
+    "input_payload": "New merchant 'Bloom Naturals' (ayurvedic supplements) completed signup. Evaluate for risk review.",
+    "evidence_pool": [
+      "Privacy policy present and matches registered business name.",
+      "GST registration number verified against GSTN database.",
+      "Social media presence active for 3+ years.",
+      "Bank account IFSC matches merchant's registered state.",
+      "Website product descriptions are specific and consistent."
+    ],
+    "ground_truth": "Low risk: verified GST, consistent pricing, established social presence.",
+    "duplicate_of": null,
+    "tags": ["low_risk"]
+  },
+  {
+    "case_id": "rr-002",
+    "agent_id": "risk_review",
+    "input_payload": "Merchant 'Bloom Natural Products' (herbal supplements) submitted onboarding form. Assess risk level.",
+    "evidence_pool": [
+      "Privacy policy present and matches registered business name.",
+      "GST registration number verified against GSTN database.",
+      "Social media presence active for 3+ years.",
+      "Bank account IFSC matches merchant's registered state.",
+      "Website product descriptions are specific and consistent."
+    ],
+    "ground_truth": "Low risk: verified GST, consistent pricing, established social presence.",
+    "duplicate_of": "rr-001",
+    "tags": ["low_risk", "consistency_pair"]
+  },
+  {
+    "case_id": "rr-003",
+    "agent_id": "risk_review",
+    "input_payload": "New merchant 'QuickLoan247' (personal loan facilitation) applied for payment gateway. Review risk.",
+    "evidence_pool": [
+      "RBI NBFC registration not found in public registry.",
+      "Website registered 8 days ago; no historical presence.",
+      "Customer testimonials appear fabricated (stock photos used).",
+      "Requested credit limit 10x higher than stated monthly revenue.",
+      "No physical address verified; contact number not reachable."
+    ],
+    "ground_truth": "High risk: unregistered NBFC, new domain, fabricated social proof, unverifiable contact.",
+    "duplicate_of": null,
+    "tags": ["high_risk"]
+  },
+  {
+    "case_id": "rr-004",
+    "agent_id": "risk_review",
+    "input_payload": "Merchant 'QuickLoan 24/7 Finance' (instant personal loans) completed signup. Evaluate for payment processing.",
+    "evidence_pool": [
+      "RBI NBFC registration not found in public registry.",
+      "Website registered 8 days ago; no historical presence.",
+      "Customer testimonials appear fabricated (stock photos used).",
+      "Requested credit limit 10x higher than stated monthly revenue.",
+      "No physical address verified; contact number not reachable."
+    ],
+    "ground_truth": "High risk: unregistered NBFC, new domain, fabricated social proof, unverifiable contact.",
+    "duplicate_of": "rr-003",
+    "tags": ["high_risk", "consistency_pair"]
+  },
+  {
+    "case_id": "rr-005",
+    "agent_id": "risk_review",
+    "input_payload": "Merchant 'FreshCart Groceries' (online grocery delivery) applied for UPI payments. Assess risk.",
+    "evidence_pool": [
+      "FSSAI food safety license verified.",
+      "Delivery service operational in 3 cities per logistics partner data.",
+      "Merchant processed 1,200+ transactions on previous gateway without disputes.",
+      "Company registered under MCA with 2 years of filings.",
+      "Chargeback rate 0.1% on previous platform."
+    ],
+    "ground_truth": "Low risk: regulated food business, clean transaction history, verified MCA registration.",
+    "duplicate_of": null,
+    "tags": ["low_risk"]
+  },
+  {
+    "case_id": "rr-006",
+    "agent_id": "risk_review",
+    "input_payload": "New merchant 'CryptoPay Solutions' (crypto-to-fiat conversion service) applied. Review for onboarding.",
+    "evidence_pool": [
+      "RBI circular RBI/2022-23/186 prohibits facilitation of crypto transactions by regulated entities.",
+      "Business model explicitly involves crypto asset conversions.",
+      "No SEBI or RBI exemption certificate presented.",
+      "Founders have prior business with regulatory violations on record."
+    ],
+    "ground_truth": "High risk: business model prohibited under RBI crypto circular, regulatory history of founders.",
+    "duplicate_of": null,
+    "tags": ["high_risk", "regulatory"]
+  },
+  {
+    "case_id": "rr-007",
+    "agent_id": "risk_review",
+    "input_payload": "Merchant 'Spice Route Restaurant' (cloud kitchen) requests payment link integration. Review.",
+    "evidence_pool": [
+      "FSSAI license valid and current.",
+      "Zomato/Swiggy listed with 4.2 star rating across 500+ reviews.",
+      "GST returns filed for last 4 quarters.",
+      "Average order value consistent with cloud kitchen segment."
+    ],
+    "ground_truth": "Low risk: licensed food business, verified delivery platform presence, consistent GST filings.",
+    "duplicate_of": null,
+    "tags": ["low_risk"]
+  },
+  {
+    "case_id": "rr-008",
+    "agent_id": "risk_review",
+    "input_payload": "Merchant 'MedEquip Direct' (medical device reseller) submitted application for payment gateway. Evaluate.",
+    "evidence_pool": [
+      "CDSCO device import license present for listed products.",
+      "Wholesale drug license not applicable for Class A devices sold.",
+      "3 years of clean GST filings; annual turnover INR 2.4 crore.",
+      "Website shows only regulatory-approved devices with proper labeling.",
+      "One past chargeback in 18 months due to courier delay, resolved."
+    ],
+    "ground_truth": "Low risk: regulatory compliance verified for device category, clean financial history.",
+    "duplicate_of": null,
+    "tags": ["low_risk", "medical"]
+  }
+]

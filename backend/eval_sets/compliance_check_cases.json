@@ -1,0 +1,122 @@
+[
+  {
+    "case_id": "comp-001",
+    "agent_id": "compliance_check",
+    "input_payload": "Merchant 'HealthFit Pharmacy' operating online drug store. Review compliance with RBI and CDSCO regulations.",
+    "evidence_pool": [
+      "CDSCO Form 20B/21B wholesale drug license verified as active.",
+      "Prescription verification step mandated before checkout on website.",
+      "No schedule H1 drugs sold online per merchant catalog audit.",
+      "RBI Master Direction on Payment Aggregators §14: mandatory Merchant Due Diligence completed.",
+      "Privacy policy includes mandatory Health Data Privacy declaration per DISHA guidelines."
+    ],
+    "ground_truth": "COMPLIANT: Valid CDSCO licenses, mandatory prescription check active, no prohibited drugs.",
+    "duplicate_of": null,
+    "tags": ["compliant", "pharmacy"]
+  },
+  {
+    "case_id": "comp-002",
+    "agent_id": "compliance_check",
+    "input_payload": "Merchant 'HealthFit Online Drugs' operating online pharmacy. Assess regulatory compliance.",
+    "evidence_pool": [
+      "CDSCO Form 20B/21B wholesale drug license verified as active.",
+      "Prescription verification step mandated before checkout on website.",
+      "No schedule H1 drugs sold online per merchant catalog audit.",
+      "RBI Master Direction on Payment Aggregators §14: mandatory Merchant Due Diligence completed.",
+      "Privacy policy includes mandatory Health Data Privacy declaration per DISHA guidelines."
+    ],
+    "ground_truth": "COMPLIANT: Valid CDSCO licenses, mandatory prescription check active, no prohibited drugs.",
+    "duplicate_of": "comp-001",
+    "tags": ["compliant", "pharmacy", "consistency_pair"]
+  },
+  {
+    "case_id": "comp-003",
+    "agent_id": "compliance_check",
+    "input_payload": "Merchant 'BetWins Gaming' offering online real-money rummy and poker games. Assess compliance.",
+    "evidence_pool": [
+      "MeitY Information Technology Rules 2023 §4A: self-regulatory body (SRB) verification required for real-money games.",
+      "Merchant submitted SRB verification certificate from E-Gaming Federation.",
+      "Age verification gate (18+) implemented prior to deposit.",
+      "State restrictions enforced: users from Assam, Odisha, Telangana, Andhra Pradesh blocked by IP/location.",
+      "TDS deduction mechanism under Section 194BA of Income Tax Act integrated for net winnings."
+    ],
+    "ground_truth": "COMPLIANT: SRB certification verified, state geofencing active, 194BA TDS compliant.",
+    "duplicate_of": null,
+    "tags": ["compliant", "gaming"]
+  },
+  {
+    "case_id": "comp-004",
+    "agent_id": "compliance_check",
+    "input_payload": "Merchant 'CryptoYield Staking' offering 18% annual return on USDT deposits. Review compliance.",
+    "evidence_pool": [
+      "RBI Circular RBI/2021-22/82: Regulated payment gateways prohibited from processing crypto asset transactions.",
+      "No FIU-IND (Financial Intelligence Unit - India) VDA provider registration found.",
+      "Guaranteed return scheme triggers Banning of Unregulated Deposit Schemes Act 2019.",
+      "No SEBI registration for investment advice or Collective Investment Scheme (CIS).",
+      "High fraud probability score."
+    ],
+    "ground_truth": "NON-COMPLIANT: Prohibited under RBI VDA circular, unregistered deposit scheme, missing FIU-IND registration.",
+    "duplicate_of": null,
+    "tags": ["non_compliant", "crypto", "prohibited"]
+  },
+  {
+    "case_id": "comp-005",
+    "agent_id": "compliance_check",
+    "input_payload": "Merchant 'PayQuick Remit' offering cross-border inward money transfer to India. Evaluate compliance.",
+    "evidence_pool": [
+      "RBI MTSS (Money Transfer Service Scheme) license valid until 2028.",
+      "Maximum cap of USD 2,500 per transaction enforced per RBI MTSS guidelines.",
+      "Annual limit of 30 remittances per individual beneficiary monitored.",
+      "FIU-IND STR (Suspicious Transaction Report) filing workflow integrated.",
+      "No outward remittances facilitated under MTSS license (compliant with scope)."
+    ],
+    "ground_truth": "COMPLIANT: Active MTSS license, USD 2500 cap enforced, FIU-IND reporting ready.",
+    "duplicate_of": null,
+    "tags": ["compliant", "remittance"]
+  },
+  {
+    "case_id": "comp-006",
+    "agent_id": "compliance_check",
+    "input_payload": "Merchant 'ForexTraders Pro' offering leveraged retail forex trading online. Review.",
+    "evidence_pool": [
+      "FEMA (Foreign Exchange Management Act) 1999: unauthorized forex trading portals prohibited.",
+      "RBI alert list dated 2023 includes ForexTraders Pro as unauthorized trading platform.",
+      "No SEBI broker license or recognized stock exchange membership.",
+      "Merchant attempting to disguise MCC code as 'Educational Services'.",
+      "Merchant MCC misdeclaration violates RBI Payment Aggregator Guidelines §16."
+    ],
+    "ground_truth": "NON-COMPLIANT: Listed on RBI unauthorized forex alert list, FEMA violation, MCC misdeclaration.",
+    "duplicate_of": null,
+    "tags": ["non_compliant", "forex", "rbi_alert"]
+  },
+  {
+    "case_id": "comp-007",
+    "agent_id": "compliance_check",
+    "input_payload": "Merchant 'LendEasy Finance' operating P2P lending platform. Assess regulatory compliance.",
+    "evidence_pool": [
+      "RBI NBFC-P2P registration certificate valid under Master Direction DNBR.072.",
+      "Lender cap of INR 50 lakh aggregate across all P2P platforms enforced.",
+      "Escrow account maintained with ICICI Bank for fund routing per RBI guidelines.",
+      "No credit risk guarantee offered by platform to lenders (compliant with §6.2).",
+      "Fair Practices Code displayed prominently on website."
+    ],
+    "ground_truth": "COMPLIANT: Valid NBFC-P2P registration, escrow account verified, lender limits enforced.",
+    "duplicate_of": null,
+    "tags": ["compliant", "p2p_lending"]
+  },
+  {
+    "case_id": "comp-008",
+    "agent_id": "compliance_check",
+    "input_payload": "Merchant 'LendEasy P2P' operating peer-to-peer lending portal. Assess compliance.",
+    "evidence_pool": [
+      "RBI NBFC-P2P registration certificate valid under Master Direction DNBR.072.",
+      "Lender cap of INR 50 lakh aggregate across all P2P platforms enforced.",
+      "Escrow account maintained with ICICI Bank for fund routing per RBI guidelines.",
+      "No credit risk guarantee offered by platform to lenders (compliant with §6.2).",
+      "Fair Practices Code displayed prominently on website."
+    ],
+    "ground_truth": "COMPLIANT: Valid NBFC-P2P registration, escrow account verified, lender limits enforced.",
+    "duplicate_of": "comp-007",
+    "tags": ["compliant", "p2p_lending", "consistency_pair"]
+  }
+]

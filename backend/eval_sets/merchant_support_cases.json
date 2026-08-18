@@ -1,0 +1,107 @@
+[
+  {
+    "case_id": "ms-001",
+    "agent_id": "merchant_support",
+    "input_payload": "When will my settlement for transactions processed on 14 August arrive? I haven't received it yet.",
+    "evidence_pool": [
+      "Standard settlement cycle: T+2 business days for most merchant categories.",
+      "Merchant's account is on T+2 settlement cycle per onboarding agreement.",
+      "14 August 2026 was a Thursday; next business days: 15 Aug (Friday), 18 Aug (Monday).",
+      "No public holidays between 14–18 August 2026.",
+      "Merchant's bank: Axis Bank; NEFT settlement batch runs at 08:00, 11:00, 14:00, 17:00, 20:00 IST."
+    ],
+    "ground_truth": "Settlement for 14 August transactions will arrive by 18 August 2026 (T+2 business days: 15 Aug, 18 Aug).",
+    "duplicate_of": null,
+    "tags": ["settlement", "timing"]
+  },
+  {
+    "case_id": "ms-002",
+    "agent_id": "merchant_support",
+    "input_payload": "I processed payments on August 14th but my settlement hasn't come through. When should I expect it?",
+    "evidence_pool": [
+      "Standard settlement cycle: T+2 business days for most merchant categories.",
+      "Merchant's account is on T+2 settlement cycle per onboarding agreement.",
+      "14 August 2026 was a Thursday; next business days: 15 Aug (Friday), 18 Aug (Monday).",
+      "No public holidays between 14–18 August 2026.",
+      "Merchant's bank: Axis Bank; NEFT settlement batch runs at 08:00, 11:00, 14:00, 17:00, 20:00 IST."
+    ],
+    "ground_truth": "Settlement for 14 August transactions will arrive by 18 August 2026 (T+2 business days: 15 Aug, 18 Aug).",
+    "duplicate_of": "ms-001",
+    "tags": ["settlement", "timing", "consistency_pair"]
+  },
+  {
+    "case_id": "ms-003",
+    "agent_id": "merchant_support",
+    "input_payload": "A customer's UPI AutoPay mandate for my subscription service failed with 'MANDATE_EXPIRED'. What happened and what should I do?",
+    "evidence_pool": [
+      "UPI AutoPay mandates have a validity period set at creation; expired mandates cannot be debited.",
+      "NPCI mandate status API confirms mandate_id MPX8834 expired on 10 August 2026.",
+      "Customer was not sent a pre-expiry renewal reminder (merchant's notification setting was off).",
+      "Resolution: merchant must request customer to re-register mandate via the payment link.",
+      "NPCI allows mandate renewal within 30 days of creation date if merchant initiates."
+    ],
+    "ground_truth": "Mandate MPX8834 expired on 10 August; customer must register a new mandate. Enable renewal reminders to prevent recurrence.",
+    "duplicate_of": null,
+    "tags": ["upi", "mandate", "subscription"]
+  },
+  {
+    "case_id": "ms-004",
+    "agent_id": "merchant_support",
+    "input_payload": "I was charged a payment gateway fee of 2.5% on a government services transaction. Our agreement shows 0.5% for government category. Please clarify.",
+    "evidence_pool": [
+      "Merchant's onboarding category: 'Government Services (Municipal Payments)' — MDR: 0.5%.",
+      "Transaction TXN99812 classified as category code 9399 (Government Services, General) — MDR 0.5% applies.",
+      "Invoice line shows 2.5% charged — investigation required.",
+      "Fee override applied by system: transaction tagged as 'Cross-border initiated' — MDR 2.5% triggered.",
+      "Customer's UPI app registered in Nepal; NPCI marks as cross-border, overriding merchant MDR."
+    ],
+    "ground_truth": "Fee discrepancy caused by cross-border UPI transaction classification (customer UPI registered in Nepal); raise dispute for fee correction citing merchant MDR agreement.",
+    "duplicate_of": null,
+    "tags": ["fees", "mdr", "dispute"]
+  },
+  {
+    "case_id": "ms-005",
+    "agent_id": "merchant_support",
+    "input_payload": "Our dispute fee of 2.5% on a government transaction is wrong. Agreement says 0.5%. What should we do?",
+    "evidence_pool": [
+      "Merchant's onboarding category: 'Government Services (Municipal Payments)' — MDR: 0.5%.",
+      "Transaction TXN99812 classified as category code 9399 (Government Services, General) — MDR 0.5% applies.",
+      "Invoice line shows 2.5% charged — investigation required.",
+      "Fee override applied by system: transaction tagged as 'Cross-border initiated' — MDR 2.5% triggered.",
+      "Customer's UPI app registered in Nepal; NPCI marks as cross-border, overriding merchant MDR."
+    ],
+    "ground_truth": "Fee discrepancy caused by cross-border UPI transaction classification (customer UPI registered in Nepal); raise dispute for fee correction citing merchant MDR agreement.",
+    "duplicate_of": "ms-004",
+    "tags": ["fees", "mdr", "dispute", "consistency_pair"]
+  },
+  {
+    "case_id": "ms-006",
+    "agent_id": "merchant_support",
+    "input_payload": "We offer monthly SaaS subscriptions (INR 999/month). What's the best payment method to reduce failed auto-debit attempts?",
+    "evidence_pool": [
+      "UPI AutoPay success rate for recurring payments: 94.2% (RBI data, Q1 2026).",
+      "NACH e-mandate success rate: 89.7%; higher failure on first debit if bank verification pending.",
+      "Card recurring (SI) success rate: 87.1% for Indian-issued cards; depends on card limits.",
+      "UPI AutoPay allows pre-debit notifications 24h before, reducing customer surprises.",
+      "Amount INR 999 is below UPI AutoPay limit of INR 1 lakh for recurring mandates."
+    ],
+    "ground_truth": "Recommend UPI AutoPay: highest success rate (94.2%), mandatory pre-debit notifications reduce disputes, and INR 999 is well within limits.",
+    "duplicate_of": null,
+    "tags": ["subscription", "payment_method", "saas"]
+  },
+  {
+    "case_id": "ms-007",
+    "agent_id": "merchant_support",
+    "input_payload": "My merchant account was put on 'rolling reserve' hold — 10% of settlements withheld for 180 days. Is this standard? Can it be reduced?",
+    "evidence_pool": [
+      "Rolling reserve is standard practice for high-risk merchant categories or new merchants with limited history.",
+      "Merchant category: 'Travel — OTA' (MCC 4722) — classified high-risk for chargebacks.",
+      "Merchant's chargeback rate last 90 days: 1.8% (industry threshold: 1.0%).",
+      "Rolling reserve can be reviewed after 6 months of compliant operation.",
+      "Reduction criteria: chargeback rate below 0.5% for 3 consecutive months."
+    ],
+    "ground_truth": "Rolling reserve is standard for OTA merchants with 1.8% chargeback rate (above 1% threshold). Reduction possible after 6 months if chargeback rate falls below 0.5% for 3 consecutive months.",
+    "duplicate_of": null,
+    "tags": ["reserve", "chargeback", "travel"]
+  }
+]
