@@ -4,12 +4,10 @@ All implementations use specific, standard techniques as specified in §1.3.
 """
 from __future__ import annotations
 
+import collections
 import math
 from dataclasses import dataclass
 from typing import Optional
-
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 
 from .schema import AgentOutput, EvalCase
 
@@ -199,11 +197,25 @@ def detect_drift(
 
 
 # ---------------------------------------------------------------------------
-# Internal helper
+# Internal helper — pure-Python TF-IDF cosine similarity (no sklearn)
 # ---------------------------------------------------------------------------
+
+def _tokenize(text: str) -> list[str]:
+    """Lowercase, split on non-alphanumeric characters."""
+    import re
+    return re.findall(r"[a-z0-9]+", text.lower())
+
+
+def _tfidf_vector(tokens: list[str], idf: dict[str, float]) -> dict[str, float]:
+    """Compute TF-IDF vector for a list of tokens given a precomputed IDF dict."""
+    tf = collections.Counter(tokens)
+    total = len(tokens) or 1
+    return {t: (count / total) * idf.get(t, 0.0) for t, count in tf.items()}
+
 
 def _cosine_similarity(text_a: str, text_b: str) -> float:
     """Compute TF-IDF cosine similarity between two text strings.
+    Pure Python implementation — no external dependencies.
     Returns 0.0 when either string is empty/whitespace.
     """
     a = (text_a or "").strip()
@@ -211,9 +223,26 @@ def _cosine_similarity(text_a: str, text_b: str) -> float:
     if not a or not b:
         return 0.0
     try:
-        vec = TfidfVectorizer(stop_words=None)
-        tfidf = vec.fit_transform([a, b])
-        sim = cosine_similarity(tfidf[0:1], tfidf[1:2])[0][0]
-        return float(round(sim, 4))
+        tok_a = _tokenize(a)
+        tok_b = _tokenize(b)
+        if not tok_a or not tok_b:
+            return 0.0
+
+        # IDF over the two-document corpus
+        vocab = set(tok_a) | set(tok_b)
+        idf: dict[str, float] = {}
+        for term in vocab:
+            df = (term in set(tok_a)) + (term in set(tok_b))
+            idf[term] = math.log((2 + 1) / (df + 1)) + 1.0  # smooth IDF
+
+        vec_a = _tfidf_vector(tok_a, idf)
+        vec_b = _tfidf_vector(tok_b, idf)
+
+        # Dot product
+        dot = sum(vec_a.get(t, 0.0) * vec_b.get(t, 0.0) for t in vocab)
+        norm_a = math.sqrt(sum(v ** 2 for v in vec_a.values())) or 1e-10
+        norm_b = math.sqrt(sum(v ** 2 for v in vec_b.values())) or 1e-10
+
+        return float(round(dot / (norm_a * norm_b), 4))
     except Exception:
         return 0.0
