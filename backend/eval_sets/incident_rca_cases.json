@@ -1,0 +1,107 @@
+[
+  {
+    "case_id": "rca-001",
+    "agent_id": "incident_rca",
+    "input_payload": "Payment failure spike: 23% of UPI transactions failing with error code 'BENEFICIARY_BANK_TIMEOUT' between 14:00–14:45 IST. Investigate root cause.",
+    "evidence_pool": [
+      "NPCI switch latency p99 spiked to 8.2s at 14:03 IST (normal < 2s).",
+      "Internal payment router logs show 100% of failures routing via beneficiary bank 'SBI UPI'.",
+      "SBI NPCI node status page: 'Partial Degradation' reported at 14:00 IST.",
+      "Retry queue depth increased 400% during the window.",
+      "No changes deployed to internal routing service in past 72 hours."
+    ],
+    "ground_truth": "Root cause: SBI UPI node degradation on NPCI caused beneficiary-side timeouts; no internal failure.",
+    "duplicate_of": null,
+    "tags": ["upi", "bank_degradation"]
+  },
+  {
+    "case_id": "rca-002",
+    "agent_id": "incident_rca",
+    "input_payload": "UPI transaction failures spiked to 23% between 2 PM and 2:45 PM today. Error: BENEFICIARY_BANK_TIMEOUT. Find root cause.",
+    "evidence_pool": [
+      "NPCI switch latency p99 spiked to 8.2s at 14:03 IST (normal < 2s).",
+      "Internal payment router logs show 100% of failures routing via beneficiary bank 'SBI UPI'.",
+      "SBI NPCI node status page: 'Partial Degradation' reported at 14:00 IST.",
+      "Retry queue depth increased 400% during the window.",
+      "No changes deployed to internal routing service in past 72 hours."
+    ],
+    "ground_truth": "Root cause: SBI UPI node degradation on NPCI caused beneficiary-side timeouts; no internal failure.",
+    "duplicate_of": "rca-001",
+    "tags": ["upi", "bank_degradation", "consistency_pair"]
+  },
+  {
+    "case_id": "rca-003",
+    "agent_id": "incident_rca",
+    "input_payload": "Settlement batch for 2026-08-14 failed to process for 3,400 merchants. Settlements are 18 hours overdue. Investigate.",
+    "evidence_pool": [
+      "Settlement batch job timed out at 02:14 IST; job log shows 'DB connection pool exhausted'.",
+      "Read replica lag reached 47 seconds at 02:10 IST (threshold: 5s).",
+      "Database maintenance window ran 23:00–02:00 IST; vacuum operation not completed.",
+      "Alert: disk I/O on primary DB host at 98% utilization from 01:45–02:30 IST.",
+      "No backup read replica promoted during the incident window."
+    ],
+    "ground_truth": "Root cause: DB vacuum during maintenance caused I/O saturation and read replica lag, exhausting connection pool for settlement batch job.",
+    "duplicate_of": null,
+    "tags": ["settlement", "database"]
+  },
+  {
+    "case_id": "rca-004",
+    "agent_id": "incident_rca",
+    "input_payload": "Webhook delivery failure rate 67% for all merchants from 09:00–11:30 IST. Merchants report missing payment notifications. Investigate.",
+    "evidence_pool": [
+      "Webhook dispatcher service restarted 3 times between 09:00 and 10:00 IST.",
+      "OOM killer log: dispatcher process killed at 08:57 IST; heap at 95% of limit.",
+      "Payload size spike: average webhook payload grew from 1.2 KB to 14 KB after v2.3.1 deploy at 08:45 IST.",
+      "v2.3.1 release notes: 'Added full transaction metadata to webhook payload'.",
+      "No autoscaling trigger fired; memory limit unchanged since v1.8."
+    ],
+    "ground_truth": "Root cause: v2.3.1 webhook payload bloat caused OOM kills on dispatcher; memory limits not updated for new payload size.",
+    "duplicate_of": null,
+    "tags": ["webhook", "oom", "deployment"]
+  },
+  {
+    "case_id": "rca-005",
+    "agent_id": "incident_rca",
+    "input_payload": "Webhook delivery failures at 67% from 9 AM to 11:30 AM today. All merchant payment alerts delayed. Find root cause.",
+    "evidence_pool": [
+      "Webhook dispatcher service restarted 3 times between 09:00 and 10:00 IST.",
+      "OOM killer log: dispatcher process killed at 08:57 IST; heap at 95% of limit.",
+      "Payload size spike: average webhook payload grew from 1.2 KB to 14 KB after v2.3.1 deploy at 08:45 IST.",
+      "v2.3.1 release notes: 'Added full transaction metadata to webhook payload'.",
+      "No autoscaling trigger fired; memory limit unchanged since v1.8."
+    ],
+    "ground_truth": "Root cause: v2.3.1 webhook payload bloat caused OOM kills on dispatcher; memory limits not updated for new payload size.",
+    "duplicate_of": "rca-004",
+    "tags": ["webhook", "oom", "deployment", "consistency_pair"]
+  },
+  {
+    "case_id": "rca-006",
+    "agent_id": "incident_rca",
+    "input_payload": "Card payment authorization rate dropped from 94% to 71% at 16:00 IST. Card network error codes show 'ISSUER_NOT_AVAILABLE'. Investigate.",
+    "evidence_pool": [
+      "Visa network advisory: 'Issuer connectivity issues for HDFC Bank cards' issued at 15:58 IST.",
+      "HDFC Bank card auth success rate: 38% (normal 96%) from 16:00 IST.",
+      "Non-HDFC card auth rate: 95% (unchanged).",
+      "Internal 3DS server response time normal throughout.",
+      "Customer complaints concentrated on HDFC debit/credit card users."
+    ],
+    "ground_truth": "Root cause: HDFC Bank issuer-side outage on Visa network; no internal payment stack failure.",
+    "duplicate_of": null,
+    "tags": ["card_payments", "bank_outage"]
+  },
+  {
+    "case_id": "rca-007",
+    "agent_id": "incident_rca",
+    "input_payload": "Payout processing latency increased 5x for IMPS transfers from 13:00 IST. Average latency 45s vs normal 9s. Investigate.",
+    "evidence_pool": [
+      "NPCI IMPS processing queue backlog: 1.2 million transactions at 13:05 IST.",
+      "RBI circular released at 12:45 IST mandating additional AML screening for IMPS payouts above INR 5 lakh.",
+      "Internal AML screening service processing 3x normal volume; CPU at 89%.",
+      "New AML rule deployed at 12:50 IST triggered by RBI circular implementation.",
+      "Payout amounts above INR 5 lakh represent 34% of volume, up from 12% after month-end bulk payouts."
+    ],
+    "ground_truth": "Root cause: new RBI-mandated AML screening rule combined with month-end payout volume spike overloaded AML screening service, cascading into NPCI queue backlog.",
+    "duplicate_of": null,
+    "tags": ["payout", "aml", "regulatory"]
+  }
+]

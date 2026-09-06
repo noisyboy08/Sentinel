@@ -1,0 +1,122 @@
+[
+  {
+    "case_id": "kyc-001",
+    "agent_id": "onboarding_kyc",
+    "input_payload": "Merchant 'Aryan Textiles' submitted KYC for sole proprietorship. PAN: ABCPA1234Z, Aadhaar linked. Review for approval.",
+    "evidence_pool": [
+      "PAN card ABCPA1234Z issued to Aryan Mehta — name matches business owner declaration.",
+      "Aadhaar biometric verification passed for Aryan Mehta (DOB 1985-03-12).",
+      "Bank account linked to PAN; IFSC HDFC0001234 verified as valid branch.",
+      "Business address proof: electricity bill dated within last 3 months.",
+      "No prior KYC rejections found in Razorpay system."
+    ],
+    "ground_truth": "APPROVED: PAN-Aadhaar link verified, bank account matched, address proof current.",
+    "duplicate_of": null,
+    "tags": ["approved", "sole_proprietorship"]
+  },
+  {
+    "case_id": "kyc-002",
+    "agent_id": "onboarding_kyc",
+    "input_payload": "Merchant 'Aryan Textile Works' submitted KYC application for payment gateway. PAN: ABCPA1234Z. Assess approval.",
+    "evidence_pool": [
+      "PAN card ABCPA1234Z issued to Aryan Mehta — name matches business owner declaration.",
+      "Aadhaar biometric verification passed for Aryan Mehta (DOB 1985-03-12).",
+      "Bank account linked to PAN; IFSC HDFC0001234 verified as valid branch.",
+      "Business address proof: electricity bill dated within last 3 months.",
+      "No prior KYC rejections found in Razorpay system."
+    ],
+    "ground_truth": "APPROVED: PAN-Aadhaar link verified, bank account matched, address proof current.",
+    "duplicate_of": "kyc-001",
+    "tags": ["approved", "sole_proprietorship", "consistency_pair"]
+  },
+  {
+    "case_id": "kyc-003",
+    "agent_id": "onboarding_kyc",
+    "input_payload": "Merchant 'FastCash Wallet' submitted KYC for private limited company. Director: Suresh Gupta. Review.",
+    "evidence_pool": [
+      "Certificate of Incorporation issued by MCA for FastCash Wallet Private Limited.",
+      "Director Suresh Gupta's PAN verified against MCA director registry.",
+      "Registered office address matches MCA filings.",
+      "Company incorporated 14 days ago — under 30-day monitoring threshold.",
+      "No audited financials available (company < 1 year old)."
+    ],
+    "ground_truth": "APPROVED with monitoring: Incorporation verified, director KYC complete, but company age flag triggered for enhanced monitoring.",
+    "duplicate_of": null,
+    "tags": ["approved", "private_limited", "new_company"]
+  },
+  {
+    "case_id": "kyc-004",
+    "agent_id": "onboarding_kyc",
+    "input_payload": "Merchant 'PayMaster Solutions' submitted KYC. Submitted GST certificate only; no PAN or Aadhaar provided.",
+    "evidence_pool": [
+      "GST certificate: GSTIN 27AABCP1234A1Z5 verified as active for PayMaster Solutions.",
+      "No PAN card submitted by merchant — mandatory under RBI KYC Master Directions 2016.",
+      "No Aadhaar or other OVD submitted.",
+      "Business address present on GST certificate.",
+      "RBI KYC Master Directions §16: PAN is mandatory OVD for all payment gateway onboarding."
+    ],
+    "ground_truth": "REJECTED: Mandatory PAN card not submitted per RBI KYC Master Directions §16.",
+    "duplicate_of": null,
+    "tags": ["rejected", "missing_documents"]
+  },
+  {
+    "case_id": "kyc-005",
+    "agent_id": "onboarding_kyc",
+    "input_payload": "Merchant 'ZenYoga Studios' (wellness center) submitted KYC. Partnership firm with 2 partners. Review.",
+    "evidence_pool": [
+      "Partnership deed registered with Registrar of Firms, Mumbai.",
+      "PAN cards for both partners verified against Income Tax database.",
+      "Current bank statement (last 6 months) for partnership account provided.",
+      "FSSAI registration not required for non-food wellness services.",
+      "Business has operated for 4 years with clean GST filings."
+    ],
+    "ground_truth": "APPROVED: Partnership deed registered, both partners KYC complete, clean financial history.",
+    "duplicate_of": null,
+    "tags": ["approved", "partnership"]
+  },
+  {
+    "case_id": "kyc-006",
+    "agent_id": "onboarding_kyc",
+    "input_payload": "Merchant 'GoldPawn Loans' (gold loan agent) submitted KYC. Claims NBFc status.",
+    "evidence_pool": [
+      "RBI NBFC registration search: GoldPawn Loans NOT found in NBFC registry.",
+      "Business registration as sole proprietorship (not NBFC-eligible structure).",
+      "Merchant's MCA filing shows 'money lending' as business activity.",
+      "RBI circular: unlicensed money lending activities prohibited for payment gateway use.",
+      "Merchant submitted Certificate of Incorporation — but for a trading company, not financial entity."
+    ],
+    "ground_truth": "REJECTED: Claimed NBFC status unverifiable; RBI registration absent; money lending without license is prohibited.",
+    "duplicate_of": null,
+    "tags": ["rejected", "regulatory", "nbfc"]
+  },
+  {
+    "case_id": "kyc-007",
+    "agent_id": "onboarding_kyc",
+    "input_payload": "Merchant 'EduLearn Academy' (online education platform) submitted KYC. Review for payment gateway.",
+    "evidence_pool": [
+      "Private limited company incorporated under Companies Act 2013.",
+      "Director PAN and Aadhaar verified.",
+      "Platform registered on DIKSHA government portal as education provider.",
+      "Annual turnover declared: INR 1.8 crore (last audited year).",
+      "No regulatory restrictions on online education businesses accepting digital payments."
+    ],
+    "ground_truth": "APPROVED: Education platform with clean corporate structure, verified directors, and no regulatory restrictions.",
+    "duplicate_of": null,
+    "tags": ["approved", "education"]
+  },
+  {
+    "case_id": "kyc-008",
+    "agent_id": "onboarding_kyc",
+    "input_payload": "Merchant 'EduLearn Courses' (e-learning courses) submitted KYC for subscription payments. Assess.",
+    "evidence_pool": [
+      "Private limited company incorporated under Companies Act 2013.",
+      "Director PAN and Aadhaar verified.",
+      "Platform registered on DIKSHA government portal as education provider.",
+      "Annual turnover declared: INR 1.8 crore (last audited year).",
+      "No regulatory restrictions on online education businesses accepting digital payments."
+    ],
+    "ground_truth": "APPROVED: Education platform with clean corporate structure, verified directors, and no regulatory restrictions.",
+    "duplicate_of": "kyc-007",
+    "tags": ["approved", "education", "consistency_pair"]
+  }
+]

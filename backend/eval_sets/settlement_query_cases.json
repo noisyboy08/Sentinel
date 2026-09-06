@@ -1,0 +1,122 @@
+[
+  {
+    "case_id": "settle-001",
+    "agent_id": "settlement_query",
+    "input_payload": "Merchant MID-44512 ('CloudBooks SaaS') reports settlement of INR 1,84,500 expected today not received. Investigate.",
+    "evidence_pool": [
+      "Settlement batch SB-20260810 processed at 14:00 IST; status: CREDITED.",
+      "Beneficiary bank HDFC processed the NEFT transfer at 14:22 IST.",
+      "Merchant's bank HDFC confirmed credit to account ending 4521 at 15:05 IST.",
+      "No pending hold flags on MID-44512.",
+      "Standard T+2 settlement cycle; today is T+2 for the reference transactions."
+    ],
+    "ground_truth": "Settlement credited at 15:05 IST to HDFC account ending 4521. No action required.",
+    "duplicate_of": null,
+    "tags": ["resolved", "saas"]
+  },
+  {
+    "case_id": "settle-002",
+    "agent_id": "settlement_query",
+    "input_payload": "Merchant MID-44512 ('CloudBooks Software') says their INR 1,84,500 payment hasn't arrived. Check status.",
+    "evidence_pool": [
+      "Settlement batch SB-20260810 processed at 14:00 IST; status: CREDITED.",
+      "Beneficiary bank HDFC processed the NEFT transfer at 14:22 IST.",
+      "Merchant's bank HDFC confirmed credit to account ending 4521 at 15:05 IST.",
+      "No pending hold flags on MID-44512.",
+      "Standard T+2 settlement cycle; today is T+2 for the reference transactions."
+    ],
+    "ground_truth": "Settlement credited at 15:05 IST to HDFC account ending 4521. No action required.",
+    "duplicate_of": "settle-001",
+    "tags": ["resolved", "saas", "consistency_pair"]
+  },
+  {
+    "case_id": "settle-003",
+    "agent_id": "settlement_query",
+    "input_payload": "Merchant MID-78901 ('NatureCraft Handicrafts') asks why their settlement is on hold. INR 96,000 pending for 5 days.",
+    "evidence_pool": [
+      "Hold reason code: RISK-HOLD-02 — merchant flagged for chargeback rate > 1.5% in rolling 30 days.",
+      "Current chargeback rate for MID-78901: 2.1% (3 chargebacks on INR 96,000 volume).",
+      "Risk team review scheduled for 2026-08-18; hold released upon review completion.",
+      "Razorpay Settlement Policy §8.2: settlements held pending risk review when chargeback rate > 1%.",
+      "Merchant notified via email on 2026-08-13 about the hold reason."
+    ],
+    "ground_truth": "Hold due to chargeback rate 2.1% exceeding 1% threshold per §8.2. Released after risk review on 2026-08-18.",
+    "duplicate_of": null,
+    "tags": ["hold", "chargeback_rate"]
+  },
+  {
+    "case_id": "settle-004",
+    "agent_id": "settlement_query",
+    "input_payload": "Merchant MID-33210 ('ZenSpa Wellness') wants to change settlement account from SBI to ICICI. How to proceed?",
+    "evidence_pool": [
+      "Account change requires: new cancelled cheque, bank statement (last 3 months), re-KYC verification.",
+      "Processing time for bank account change: 5-7 working days per Razorpay onboarding policy.",
+      "Existing settlements will continue to credit to current SBI account until change is approved.",
+      "Merchant must submit request via Razorpay Dashboard → Settings → Bank Account.",
+      "Razorpay Support Policy: account changes processed Mon-Fri during business hours."
+    ],
+    "ground_truth": "Submit via Dashboard with cancelled cheque + bank statement; 5-7 days processing; existing account used until approved.",
+    "duplicate_of": null,
+    "tags": ["account_change"]
+  },
+  {
+    "case_id": "settle-005",
+    "agent_id": "settlement_query",
+    "input_payload": "Merchant MID-55678 ('GreenFuel Petrol') reports refund of INR 12,000 deducted from settlement but they never initiated it. Investigate.",
+    "evidence_pool": [
+      "Refund REF-20260811-4421 initiated by customer via bank chargeback dispute — not merchant-initiated.",
+      "Chargeback filed by cardholder on TXN-884521 for 'item not received'.",
+      "Merchant's delivery proof: dispatch record from logistics partner but no delivery confirmation.",
+      "Razorpay chargeback policy: refund deducted from settlement; merchant can contest with delivery proof.",
+      "Contest deadline: 7 days from deduction (2026-08-18)."
+    ],
+    "ground_truth": "Chargeback-initiated refund deducted per policy. Merchant can contest by 2026-08-18 with delivery proof.",
+    "duplicate_of": null,
+    "tags": ["chargeback_dispute", "refund"]
+  },
+  {
+    "case_id": "settle-006",
+    "agent_id": "settlement_query",
+    "input_payload": "Merchant MID-22100 ('TechBuy Electronics') settled yesterday but MDR deduction seems higher than agreed rate. Clarify.",
+    "evidence_pool": [
+      "Merchant discount rate (MDR) agreement for MID-22100: 1.8% for domestic cards, 2.5% for international.",
+      "Settlement SB-20260812: total transactions INR 3,40,000; domestic INR 2,90,000, international INR 50,000.",
+      "MDR applied: INR 2,90,000 × 1.8% = INR 5,220 + INR 50,000 × 2.5% = INR 1,250. Total: INR 6,470.",
+      "MDR deducted in settlement: INR 6,470 — matches agreement exactly.",
+      "GST on MDR at 18%: INR 1,164.60 — also deducted per GST regulations."
+    ],
+    "ground_truth": "MDR deduction correct: INR 5,220 domestic + INR 1,250 international + INR 1,164.60 GST = INR 8,634.60.",
+    "duplicate_of": null,
+    "tags": ["mdr_query", "billing"]
+  },
+  {
+    "case_id": "settle-007",
+    "agent_id": "settlement_query",
+    "input_payload": "Merchant MID-67890 ('QuickPay Logistics') settlement shows INR 0 for a day when they processed INR 2,20,000. Why?",
+    "evidence_pool": [
+      "INR 2,20,000 processed on 2026-08-10 — T+2 settlement expected 2026-08-12.",
+      "2026-08-12 was a bank holiday (Independence Day bank holiday).",
+      "Settlements are processed on next working day after holidays: 2026-08-13.",
+      "Settlement batch SB-20260813: INR 2,20,000 credited on 2026-08-13.",
+      "Razorpay Settlement FAQ: bank holidays delay NEFT/IMPS batch processing by 1 working day."
+    ],
+    "ground_truth": "Settlement delayed by bank holiday (2026-08-12). INR 2,20,000 credited next working day (2026-08-13).",
+    "duplicate_of": null,
+    "tags": ["holiday_delay"]
+  },
+  {
+    "case_id": "settle-008",
+    "agent_id": "settlement_query",
+    "input_payload": "Merchant MID-67891 ('FastMove Logistics') processed INR 2,20,000 on Aug 10 but shows zero settlement for Aug 12. Explain.",
+    "evidence_pool": [
+      "INR 2,20,000 processed on 2026-08-10 — T+2 settlement expected 2026-08-12.",
+      "2026-08-12 was a bank holiday (Independence Day bank holiday).",
+      "Settlements are processed on next working day after holidays: 2026-08-13.",
+      "Settlement batch SB-20260813: INR 2,20,000 credited on 2026-08-13.",
+      "Razorpay Settlement FAQ: bank holidays delay NEFT/IMPS batch processing by 1 working day."
+    ],
+    "ground_truth": "Settlement delayed by bank holiday (2026-08-12). INR 2,20,000 credited next working day (2026-08-13).",
+    "duplicate_of": "settle-007",
+    "tags": ["holiday_delay", "consistency_pair"]
+  }
+]

@@ -1,0 +1,107 @@
+[
+  {
+    "case_id": "dr-001",
+    "agent_id": "dispute_response",
+    "input_payload": "Chargeback claim: customer says they never received the product (order #ORD-4421, INR 3,200, electronics accessory). Should we contest?",
+    "evidence_pool": [
+      "Delivery partner Delhivery: parcel marked 'Delivered' on 10 Aug 2026 at 14:23 IST.",
+      "GPS delivery proof: coordinates match customer's registered address (within 50m).",
+      "Customer signed e-POD via Delhivery app at time of delivery.",
+      "No pre-dispute contact from customer to merchant support.",
+      "Transaction authenticated via OTP; billing address matches delivery address."
+    ],
+    "ground_truth": "Contest: strong delivery evidence (e-POD signature, GPS match, OTP auth). Dispute likely to succeed.",
+    "duplicate_of": null,
+    "tags": ["non_delivery", "contest"]
+  },
+  {
+    "case_id": "dr-002",
+    "agent_id": "dispute_response",
+    "input_payload": "Customer filed chargeback for order ORD-4421 (INR 3,200, electronics) claiming non-delivery. What is our recommended action?",
+    "evidence_pool": [
+      "Delivery partner Delhivery: parcel marked 'Delivered' on 10 Aug 2026 at 14:23 IST.",
+      "GPS delivery proof: coordinates match customer's registered address (within 50m).",
+      "Customer signed e-POD via Delhivery app at time of delivery.",
+      "No pre-dispute contact from customer to merchant support.",
+      "Transaction authenticated via OTP; billing address matches delivery address."
+    ],
+    "ground_truth": "Contest: strong delivery evidence (e-POD signature, GPS match, OTP auth). Dispute likely to succeed.",
+    "duplicate_of": "dr-001",
+    "tags": ["non_delivery", "contest", "consistency_pair"]
+  },
+  {
+    "case_id": "dr-003",
+    "agent_id": "dispute_response",
+    "input_payload": "Chargeback received: customer claims transaction of INR 8,450 was unauthorized. No interaction between customer and merchant on record. Should we contest?",
+    "evidence_pool": [
+      "Transaction authenticated with 3DS v2.2; bank confirmed authentication.",
+      "Device fingerprint matches customer's primary device (iPhone 14, last seen 3 days prior).",
+      "Transaction IP: same city as customer's home address.",
+      "Card was not reported stolen prior to transaction.",
+      "Bank fraud team notes: 'Customer claims card shared with family member who made purchase'."
+    ],
+    "ground_truth": "Contest: 3DS authentication passed, device and location match. Family-sharing disputes are merchant-favorable under chargeback rules.",
+    "duplicate_of": null,
+    "tags": ["unauthorized", "contest", "3ds"]
+  },
+  {
+    "case_id": "dr-004",
+    "agent_id": "dispute_response",
+    "input_payload": "Customer disputes INR 8,450 charge as unauthorized. Claims they did not make the purchase. Recommend action.",
+    "evidence_pool": [
+      "Transaction authenticated with 3DS v2.2; bank confirmed authentication.",
+      "Device fingerprint matches customer's primary device (iPhone 14, last seen 3 days prior).",
+      "Transaction IP: same city as customer's home address.",
+      "Card was not reported stolen prior to transaction.",
+      "Bank fraud team notes: 'Customer claims card shared with family member who made purchase'."
+    ],
+    "ground_truth": "Contest: 3DS authentication passed, device and location match. Family-sharing disputes are merchant-favorable under chargeback rules.",
+    "duplicate_of": "dr-003",
+    "tags": ["unauthorized", "contest", "3ds", "consistency_pair"]
+  },
+  {
+    "case_id": "dr-005",
+    "agent_id": "dispute_response",
+    "input_payload": "Duplicate charge dispute: customer says INR 2,100 was debited twice for the same order. Transaction IDs TXN-8812 and TXN-8813. Should we accept or contest?",
+    "evidence_pool": [
+      "TXN-8812: successful payment, order confirmed, product dispatched.",
+      "TXN-8813: created 3 seconds later; payment gateway retry on network timeout.",
+      "TXN-8813 was refunded automatically by gateway idempotency check within 4 hours.",
+      "Customer bank statement: both debits visible, refund may take 5–7 days to reflect.",
+      "Merchant order system: only one order created (ORD-7721), mapped to TXN-8812."
+    ],
+    "ground_truth": "Accept/resolve: TXN-8813 was a gateway retry already auto-refunded; proactively share refund timeline with customer to close dispute.",
+    "duplicate_of": null,
+    "tags": ["duplicate_charge", "accept"]
+  },
+  {
+    "case_id": "dr-006",
+    "agent_id": "dispute_response",
+    "input_payload": "Customer disputes INR 15,000 hotel booking chargeback: claims service not rendered (hotel was closed on travel date). Should we contest?",
+    "evidence_pool": [
+      "Hotel 'Sunrise Palace, Goa' — confirmed closure notice posted on their website on travel date (14 Aug).",
+      "Customer notified of closure by hotel via email on 12 Aug; email read receipt confirmed.",
+      "Merchant offered alternate dates; customer declined and requested full refund.",
+      "Refund was not processed by merchant prior to chargeback filing.",
+      "Merchant cancellation policy: full refund for hotel-initiated cancellations."
+    ],
+    "ground_truth": "Accept: hotel-initiated cancellation entitles customer to full refund per merchant's own policy. Contesting this dispute would likely fail and damage reputation.",
+    "duplicate_of": null,
+    "tags": ["service_not_rendered", "accept", "hospitality"]
+  },
+  {
+    "case_id": "dr-007",
+    "agent_id": "dispute_response",
+    "input_payload": "Chargeback: customer claims INR 4,500 subscription charge is unauthorized — they cancelled the subscription 30 days ago. Merchant has no cancellation record. Contest or accept?",
+    "evidence_pool": [
+      "Merchant's subscription management system: no cancellation request logged for customer ID CUS-3341.",
+      "Customer's email: cancellation request sent to 'support@merchant-old-domain.com' (deprecated address, not monitored).",
+      "Customer has screenshots of confirmation email from deprecated support address.",
+      "Active subscription debit continued for 3 months after customer's attempted cancellation.",
+      "Consumer Protection Act 2019: merchants must process cancellations from all reasonable contact channels."
+    ],
+    "ground_truth": "Accept: customer made cancellation attempt in good faith; deprecated email oversight is merchant's responsibility under consumer protection rules. Refund all 3 post-cancellation charges.",
+    "duplicate_of": null,
+    "tags": ["subscription", "cancellation", "accept"]
+  }
+]

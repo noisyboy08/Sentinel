@@ -1,0 +1,125 @@
+[
+  {
+    "case_id": "fraud-001",
+    "agent_id": "fraud_alert",
+    "input_payload": "Transaction TXN-88421: INR 49,999 card payment at merchant 'ElectroHub Delhi' from card BIN 459012. Velocity: 1 transaction in 24h. Classify.",
+    "evidence_pool": [
+      "Card BIN 459012 is a Visa Platinum issued by HDFC Bank — domestic card.",
+      "Merchant category: Consumer Electronics (MCC 5732) — consistent with amount.",
+      "Velocity check: 1 transaction in 24h — within normal limits.",
+      "Device fingerprint consistent with prior successful transactions on same card.",
+      "Billing address pincode matches delivery address."
+    ],
+    "ground_truth": "LEGITIMATE: Domestic card, consistent MCC, normal velocity, matching addresses.",
+    "duplicate_of": null,
+    "tags": ["legitimate", "electronics"]
+  },
+  {
+    "case_id": "fraud-002",
+    "agent_id": "fraud_alert",
+    "input_payload": "Transaction TXN-88421 (variant): INR 49,999 card payment at consumer electronics store from card BIN 459012. Assess fraud probability.",
+    "evidence_pool": [
+      "Card BIN 459012 is a Visa Platinum issued by HDFC Bank — domestic card.",
+      "Merchant category: Consumer Electronics (MCC 5732) — consistent with amount.",
+      "Velocity check: 1 transaction in 24h — within normal limits.",
+      "Device fingerprint consistent with prior successful transactions on same card.",
+      "Billing address pincode matches delivery address."
+    ],
+    "ground_truth": "LEGITIMATE: Domestic card, consistent MCC, normal velocity, matching addresses.",
+    "duplicate_of": "fraud-001",
+    "tags": ["legitimate", "electronics", "consistency_pair"]
+  },
+  {
+    "case_id": "fraud-003",
+    "agent_id": "fraud_alert",
+    "input_payload": "Transaction TXN-90112: INR 98,500 card payment at 'Generic Store XYZ' from international card BIN 549012. 12 transactions in 90 minutes on same card. Classify.",
+    "evidence_pool": [
+      "Card BIN 549012 is a Mastercard issued by a Singaporean bank — international card.",
+      "Velocity alert: 12 transactions in 90 minutes on same card — far above threshold of 5.",
+      "Merchant 'Generic Store XYZ' registered 3 days ago with no prior transaction history.",
+      "Amount INR 98,500 is above merchant's stated average ticket size of INR 2,000.",
+      "Device fingerprint is new — first-time device for this card.",
+      "Delivery address: a freight forwarding warehouse (high-risk shipping profile)."
+    ],
+    "ground_truth": "FRAUDULENT: High velocity, international card, new merchant, amount mismatch, freight-forwarder delivery.",
+    "duplicate_of": null,
+    "tags": ["fraudulent", "velocity", "international_card"]
+  },
+  {
+    "case_id": "fraud-004",
+    "agent_id": "fraud_alert",
+    "input_payload": "Transaction TXN-91005: INR 1,200 UPI payment at 'ChaiBazaar' from UPI ID aryan.mehta@oksbi. Classify.",
+    "evidence_pool": [
+      "UPI ID aryan.mehta@oksbi: linked to verified Aadhaar and bank account.",
+      "Merchant ChaiBazaar: Food & Beverage (MCC 5812), active for 2 years.",
+      "Amount INR 1,200: consistent with F&B average ticket.",
+      "Transaction time: 12:45 PM — peak lunch hour, normal pattern.",
+      "No prior fraud flags on this UPI ID."
+    ],
+    "ground_truth": "LEGITIMATE: Verified UPI ID, consistent merchant category and amount, no prior flags.",
+    "duplicate_of": null,
+    "tags": ["legitimate", "upi", "food"]
+  },
+  {
+    "case_id": "fraud-005",
+    "agent_id": "fraud_alert",
+    "input_payload": "Transaction TXN-92340: INR 85,000 UPI transfer to account linked to UPI ID random99xqz@paytm. Recipient account opened 2 days ago. Classify.",
+    "evidence_pool": [
+      "Recipient UPI ID random99xqz@paytm: account opened 2 days ago, no transaction history.",
+      "Sender's account shows atypical behavior: first large outgoing transfer in 6 months.",
+      "Recipient's account linked to a mobile number registered via OTP only (no Aadhaar).",
+      "Razorpay mule account detection model score: 0.92 (high probability of mule account).",
+      "Amount INR 85,000 is 43x sender's average UPI transaction size."
+    ],
+    "ground_truth": "FRAUDULENT: New recipient account, mule detection score 0.92, atypical sender behavior, amount anomaly.",
+    "duplicate_of": null,
+    "tags": ["fraudulent", "mule_account", "upi"]
+  },
+  {
+    "case_id": "fraud-006",
+    "agent_id": "fraud_alert",
+    "input_payload": "Transaction TXN-93100: INR 4,500 card transaction at pharmacy 'MedPlus' from card BIN 421055. Classify.",
+    "evidence_pool": [
+      "Card BIN 421055: Visa Classic, issued by SBI — domestic debit card.",
+      "Merchant MedPlus: MCC 5912 (Drug Stores and Pharmacies) — regulated, established chain.",
+      "Amount INR 4,500: within normal range for pharmacy purchases.",
+      "Velocity: 2 transactions in 24h — normal.",
+      "Cardholder's home pincode matches merchant city."
+    ],
+    "ground_truth": "LEGITIMATE: Domestic debit card, regulated pharmacy MCC, normal amount and velocity.",
+    "duplicate_of": null,
+    "tags": ["legitimate", "pharmacy"]
+  },
+  {
+    "case_id": "fraud-007",
+    "agent_id": "fraud_alert",
+    "input_payload": "Transaction TXN-94201: INR 2,45,000 card payment at 'JewelKing Online' from card BIN 541200. BIN mismatch: card claims UK issuer but billing address is India. Classify.",
+    "evidence_pool": [
+      "Card BIN 541200: Claims to be Mastercard issued by Barclays UK.",
+      "Billing address provided: Pune, Maharashtra, India — geographical mismatch.",
+      "Merchant JewelKing Online: Jewelry (MCC 5944) — high-value, frequent fraud target.",
+      "3D Secure authentication was bypassed — merchant not enrolled in 3DS.",
+      "Email address used for order: temp-domain throwaway address.",
+      "Chargeback rate for BIN 541200 in last 30 days: 18% — far above 0.5% threshold."
+    ],
+    "ground_truth": "FRAUDULENT: BIN-billing mismatch, high chargeback rate for BIN, 3DS bypass, throwaway email, high-risk MCC.",
+    "duplicate_of": null,
+    "tags": ["fraudulent", "bin_mismatch", "jewelry"]
+  },
+  {
+    "case_id": "fraud-008",
+    "agent_id": "fraud_alert",
+    "input_payload": "Transaction TXN-94202: INR 2,45,000 card payment at online jewelry store from suspected UK-issued card. Billing address is Indian. Assess.",
+    "evidence_pool": [
+      "Card BIN 541200: Claims to be Mastercard issued by Barclays UK.",
+      "Billing address provided: Pune, Maharashtra, India — geographical mismatch.",
+      "Merchant JewelKing Online: Jewelry (MCC 5944) — high-value, frequent fraud target.",
+      "3D Secure authentication was bypassed — merchant not enrolled in 3DS.",
+      "Email address used for order: temp-domain throwaway address.",
+      "Chargeback rate for BIN 541200 in last 30 days: 18% — far above 0.5% threshold."
+    ],
+    "ground_truth": "FRAUDULENT: BIN-billing mismatch, high chargeback rate for BIN, 3DS bypass, throwaway email, high-risk MCC.",
+    "duplicate_of": "fraud-007",
+    "tags": ["fraudulent", "bin_mismatch", "jewelry", "consistency_pair"]
+  }
+]
