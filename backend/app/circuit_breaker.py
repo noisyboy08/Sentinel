@@ -9,10 +9,16 @@ State is persisted to history.json so it survives restarts.
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 from typing import Literal
 
-DATA_DIR = Path(__file__).parent.parent / "data"
+# On serverless platforms (Vercel) the deploy directory is read-only; use /tmp.
+_on_serverless = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
+if _on_serverless:
+    DATA_DIR = Path("/tmp/sentinel_data")
+else:
+    DATA_DIR = Path(__file__).parent.parent / "data"
 HISTORY_FILE = DATA_DIR / "history.json"
 
 AgentStatus = Literal["ACTIVE", "PAUSED"]

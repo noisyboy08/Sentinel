@@ -21,6 +21,15 @@ from .razorpay_data import fetch_payment_evidence
 
 EVAL_SETS_DIR = Path(__file__).parent.parent / "eval_sets"
 
+# On serverless platforms (Vercel) the deploy directory is read-only; use /tmp.
+_on_serverless = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
+_DATA_DIR = (
+    Path("/tmp/sentinel_data")
+    if _on_serverless
+    else Path(__file__).parent.parent / "data"
+)
+_HISTORY_FILE = _DATA_DIR / "history.json"
+
 
 def load_eval_cases(agent_id: str) -> list[EvalCase]:
     path = EVAL_SETS_DIR / f"{agent_id}_cases.json"
@@ -183,10 +192,9 @@ def evaluate_agent(agent, cases: list[EvalCase] | None = None) -> AgentEvalResul
     # Load any ground-truth corrections recorded from real Razorpay webhook events.
     # Kept read-only here; checks.py stays pure (no file I/O inside it).
     _gt_corrections: list[dict] = []
-    _history_path = Path(__file__).parent.parent / "data" / "history.json"
     try:
         _gt_corrections = (
-            json.loads(_history_path.read_text())
+            json.loads(_HISTORY_FILE.read_text())
             .get("ground_truth_corrections", [])
         )
     except Exception:

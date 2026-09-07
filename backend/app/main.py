@@ -45,14 +45,28 @@ from app.alerts import fire_alert
 from app.simulate import run_simulation
 from app.backends import get_best_available_backend
 
-DATA_DIR = Path(__file__).parent.parent / "data"
+# On serverless platforms (Vercel, Lambda) the deployment directory is read-only.
+# Redirect all file I/O to /tmp which is always writable.
+# Vercel automatically sets VERCEL=1 in its runtime environment.
+_on_serverless = bool(os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
+if _on_serverless:
+    DATA_DIR = Path("/tmp/sentinel_data")
+else:
+    DATA_DIR = Path(__file__).parent.parent / "data"
 HISTORY_FILE = DATA_DIR / "history.json"
 
 app = FastAPI(title="Sentinel", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "https://sentinel-three-sigma.vercel.app",
+        # Allow any vercel.app preview deployment
+        "https://*.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
