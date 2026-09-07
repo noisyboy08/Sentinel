@@ -1,0 +1,4 @@
+# Development & test dependencies (local use only — NOT used by Vercel)
+-r requirements.txt
+pytest>=8.0.0
+httpx2
